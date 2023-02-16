@@ -1,7 +1,5 @@
-import sys
-
 # Available at setup time due to pyproject.toml
-from pybind11 import get_cmake_dir
+from glob import glob
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 from setuptools import setup
 
@@ -18,9 +16,14 @@ __version__ = "0.0.1"
 
 ext_modules = [
     Pybind11Extension("python_example",
-        ["src/main.cpp"],
+        sorted(glob("src/*.cpp")),
         # Example: passing in the version to the compiled code
         define_macros=[('VERSION_INFO', __version__)],
+        include_dirs=[
+            'D:/project/python_example/venv/Lib/site-packages/pyarrow/include',
+        ],
+        extra_link_args=[r'D:/project/python_example/venv/Lib/site-packages/pyarrow/arrow.lib',
+                         r'D:/project/python_example/venv/Lib/site-packages/pyarrow/arrow_python.lib']
         ),
 ]
 

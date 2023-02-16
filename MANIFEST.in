@@ -1,0 +1,3 @@
+include README.md LICENSE pybind11/LICENSE
+graft D:/project/python_example/venv/Lib/site-packages/pyarrow/include
+graft src

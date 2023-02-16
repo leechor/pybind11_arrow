@@ -1,8 +1,6 @@
-import sys
-
 import pandas as pd
-from pandas import DataFrame
 import python_example as m
+from pandas import DataFrame
 
 assert m.__version__ == '0.0.1'
 assert m.add(1, 2) == 3
