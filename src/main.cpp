@@ -35,6 +35,11 @@ PYBIND11_MODULE(python_example, m) {
         Some other explanation about the subtract function.
     )pbdoc");
 
+   using namespace pybind11::literals;
+   m.def("mul", [](int i, int j) {return i * j; }, R"pbdoc(
+        Multiply two numbers
+   )pbdoc", "i"_a, "j"_a);
+
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else

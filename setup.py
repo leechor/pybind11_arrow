@@ -20,7 +20,7 @@ ext_modules = [
     Pybind11Extension("python_example",
         ["src/main.cpp"],
         # Example: passing in the version to the compiled code
-        define_macros = [('VERSION_INFO', __version__)],
+        define_macros=[('VERSION_INFO', __version__)],
         ),
 ]
 
