@@ -4,15 +4,18 @@
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
-using namespace pybind11::literals;
-//py::object DataFrame = py::module_::import("pandas").attr("DataFrame");
-//py::object print_df = py::module_::import("pd_func").attr("print_df");
+
+
+
 
 int add(int i, int j) {
     return i + j;
 }
 
 PYBIND11_MODULE(python_example, m) {
+
+using namespace pybind11::literals;
+
     m.doc() = R"pbdoc(
         Pybind11 example plugin
         -----------------------
@@ -43,9 +46,11 @@ PYBIND11_MODULE(python_example, m) {
    )pbdoc", "i"_a, "j"_a);
 
    m.def("printDf", [](py::object df) {
-//        print_df(df);
-        py::print(df);
-        return df;
+        py::object DataFrame = py::module_::import("pandas").attr("DataFrame");
+        auto pd_func = py::module_::import("pd_func").attr("print_df");
+
+       py::print(pd_func(df));
+       return df;
        }, R"pbdoc(
         printDf function
     )pbdoc");
