@@ -9,7 +9,7 @@
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
-const std::string modelName = "pd_func";
+const char* modelName = "tests";
 
 int add(int i, int j) {
     return i + j;
@@ -98,6 +98,11 @@ PYBIND11_MODULE(python_example, m) {
        }, R"pbdoc(
         printDf function
     )pbdoc");
+
+   m.def("testDataFrameC", []() {
+      auto testDataFrame = py::module_::import("tests").attr("testDataFrame");
+      testDataFrame(py::module_::import("numpy"));
+   });
 
     m.def("castToArrow", &castToArrow);
     m.def("castToDataFrame", &castToDataFrame);

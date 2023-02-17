@@ -1,3 +1,4 @@
+import functools
 import types
 from typing import Any
 
@@ -5,31 +6,43 @@ import numpy as np
 import pandas as pd
 
 
-def func(self: Any, name: str, *args, **kwargs):
+def dot(self: Any, name: str = None, *args, **kwargs):
     if getattr(self, name, False):
         # contains name
         result = getattr(self, name)(*args, **kwargs)
-        if getattr(result, func.__name__, True):
-            result.func = types.MethodType(func, result)
+        if getattr(result, dot.__name__, True):
+            if isinstance(self, types.ModuleType):
+                self.dot = functools.partial(dot, self)
+            else:
+                result.dot = types.MethodType(dot, result)
         return result
-    elif getattr(self, func.__name__, True):
+
+    if getattr(self, dot.__name__, True):
         # no func attribute
-        self.func = types.MethodType(func, self)
+        if isinstance(self, types.ModuleType):
+            self.dot = functools.partial(dot, self)
+        else:
+            self.dot = types.MethodType(dot, self)
         return self
 
-def testDataFrame():
-    data = pd.DataFrame(np.random.standard_normal((2, 4)),
+
+def testDataFrame(n):
+    data = pd.DataFrame(n.random.standard_normal((2, 4)),
                         index=pd.date_range("2000-01-01", periods=2,
                                             freq="W-WED"),
                         columns=["Colorado", "Texas", "New York", "Ohio"])
     df = pd.DataFrame(data)
-    print(func(df, "").func('resample', 'D').func('asfreq'))
+    print(dot(df, "").dot('resample', 'D').dot('asfreq'))
+
+
+def test2():
+    a = dot(np.random, 'standard_normal', (2, 4))
+    index = dot(pd, 'date_range', '2000-01-01', periods=2, freq="W-WED")
+    frame = dot(pd, "DataFrame", a,
+                index=index,
+                columns=["Colorado", "Texas", "New York", "Ohio"])
+    print(frame)
 
 
 if __name__ == '__main__':
-    pd = func(pd, '')
-    np = func(np, '')
-    frame = pd.func("DataFrame", np.func("random").func('standard_normal', (2, 4)),
-                    index=pd.func('2000-01-01', periods=2, freq="W-WED"),
-                    columns=["Colorado", "Texas", "New York", "Ohio"])
-    print(frame)
+    testDataFrame()
