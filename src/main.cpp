@@ -34,9 +34,9 @@ py::object castToDataFrame(std::shared_ptr<arrow::Table> src) {
 }
 
 // Convert pyarrow table to native C++ object and print its contents
-void print_table(py::object df)
+void print_table(std::shared_ptr<arrow::Table> table)
 {
-    std::shared_ptr<arrow::Table> table = castToArrow(df);
+//    std::shared_ptr<arrow::Table> table = castToArrow(df);
     if (table == nullptr) {
         std::cout<< "Table pointer is nullptr";
         return;
@@ -53,7 +53,7 @@ void print_table(py::object df)
 
 PYBIND11_MODULE(python_example, m) {
 
-using namespace pybind11::literals;
+    using namespace pybind11::literals;
 
 
     m.doc() = R"pbdoc(

@@ -13,4 +13,5 @@ def arrow_to_dataframe(table: pa.Table):
 
 
 def print_df(df: DataFrame):
-    m.print_table(df)
+    table = dataframe_to_arrow(df)
+    m.print_table(table)
