@@ -8,6 +8,7 @@
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
+const std::string modelName = "pd_func";
 
 int add(int i, int j) {
     return i + j;
@@ -15,7 +16,7 @@ int add(int i, int j) {
 
 
 std::shared_ptr<arrow::Table> castToArrow(py::object df) {
-    py::object dataframe_to_arrow = py::module_::import("pd_func").attr("dataframe_to_arrow");
+    py::object dataframe_to_arrow = py::module_::import(modelName).attr("dataframe_to_arrow");
     py::object src = dataframe_to_arrow(df);
     PyObject *source = src.ptr();
 
@@ -89,8 +90,7 @@ PYBIND11_MODULE(python_example, m) {
    )pbdoc", "i"_a, "j"_a);
 
    m.def("printDf", [](py::object df) {
-        py::object DataFrame = py::module_::import("pandas").attr("DataFrame");
-        auto pd_func = py::module_::import("pd_func").attr("print_df");
+        auto pd_func = py::module_::import(modelName).attr("print_df");
 
        pd_func(df);
        return df;
