@@ -4,6 +4,7 @@
 #include <arrow/table.h>
 #include <pybind11/functional.h>
 #include <iostream>
+#include <pybind11/stl.h>
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
@@ -101,7 +102,13 @@ PYBIND11_MODULE(python_example, m) {
 
    m.def("testDataFrameC", []() {
       auto testDataFrame = py::module_::import("tests").attr("testDataFrame");
-      testDataFrame(py::module_::import("numpy"));
+      auto np = py::module_::import("numpy");
+      auto pd = py::module_::import("pandas");
+
+      auto a = np.attr("random").attr("standard_normal")(py::make_tuple(2, 4));
+      auto index = pd.attr("date_range")("2000-01-01", "periods"_a=2, "freq"_a="W-WED");
+      auto frame = pd.attr("DataFrame")(a, "index"_a=index, "columns"_a=std::vector<std::string> {"Colorado", "Texas", "New York", "Ohio"});
+      py::print(frame);
    });
 
     m.def("castToArrow", &castToArrow);
