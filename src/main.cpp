@@ -2,6 +2,7 @@
 #include <arrow/python/pyarrow.h>
 #include "arrow_conversions.h"
 #include <arrow/table.h>
+#include <pybind11/functional.h>
 #include <iostream>
 
 #define STRINGIFY(x) #x
