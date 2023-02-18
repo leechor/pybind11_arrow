@@ -4,24 +4,31 @@ from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
+from .pd_func import print_df
 
 
 def t(self: Any, name: str = None, *args, **kwargs):
+    current_module = sys.modules[__name__]
     if self is None:
-        self = sys.modules[__name__]
+        self = current_module
 
     if name is not None and getattr(self, name, False):
-        # contains name
         func = getattr(self, name)
         result = func(*args, **kwargs)
         inject_t(result, t)
         return result
+    elif getattr(current_module, name, False):
+        func = getattr(current_module, name)
+        result = func(self, *args, **kwargs)
+        inject_t(result, t)
+        return result
+
     inject_t(self, t)
     return self
 
 
 def inject_t(target: Any, f: Callable):
-    if getattr(target, t.__name__, False):
+    if target is None or getattr(target, f.__name__, False):
         return
 
     if isinstance(target, types.ModuleType):
