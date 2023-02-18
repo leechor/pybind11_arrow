@@ -10,7 +10,7 @@
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
-const char* modelName = "tests";
+const char* modelName = "tm";
 
 int add(int i, int j) {
     return i + j;

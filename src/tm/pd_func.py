@@ -1,7 +1,6 @@
-from pandas import DataFrame
 import pyarrow as pa
-import pandas as pd
 import python_example as m
+from pandas import DataFrame
 
 
 def dataframe_to_arrow(df: DataFrame):
