@@ -1,5 +1,8 @@
 import json
+import logging
 
+from src import *
+from src.tm.module_loading import import_string, module_import
 
 config = '''
 {
@@ -10,56 +13,45 @@ config = '''
         "name": "TM1",
         "description": "这一级别用来表示某个参数处理的信息",
         "functions": [{
-            "name": "load_data",
-            "args": [["full_name1", "full_name2"]],
-            "kwargs": {"k1": "v1", "k2": "v2"},
+            "name": "pandas.read_csv",
+            "args": [],
+            "kwargs": {"filepath_or_buffer": "D:/project/python_example/src/stock_1.csv"},
             "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
         },
         {
-            "name": "function1",
-            "args": [["full_name1", "full_name2"]],
+            "name": "print_df",
+            "args": [],
             "kwargs": {"k1": "v1", "k2": "v2"},
             "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
         }]
-
     },
     {
         "name": "TM2",
         "functions": [{
-            "name": "function2",
-            "args": ["arg1", "arg2"],
-            "kwargs": {"k1": "v1", "k2": "v2"},
-            "description": "some information"
-        },
-        {
-            "name": "function3",
-            "args": ["arg1", "arg2"],
-            "kwargs": {"k1": "v1", "k2": "v2"},
+            "name": "pandas.read_csv",
+            "args": ["D:/project/python_example/src/stock_2.csv"],
+            "kwargs": null,
             "description": "some information"
         }
     ]
-    },
-    {
-        "name": "output",
-        "functions": [{
-            "name": "convertToArrow",
-            "args": [],
-            "kwargs": {},
-            "description": "convert dataframe format to arrow format"
-        }]
     }
     ]
 }
 
-
 '''
+
+
+class Flow:
+    def __init__(self, d):
+        self.name = None
+        self.description = None
 
 
 class Configure:
     def __init__(self, d):
         self.name = None
         self.description = None
-        self.flows = None
+        self.flows: list = None
         self.__dict__ = d
 
     @classmethod
@@ -69,8 +61,18 @@ class Configure:
 
 def process(config: Configure):
     for flow in config.flows:
+        pre_result = None
         for func in flow.functions:
-            print(f'{func.name} and {func.description}')
+            logging.info(f'{func.name} and {func.description}')
+            func_name = ""
+            if '.' in func.name:
+                n = func.name
+                pre_result = module_import(n[:n.index('.')])
+                func_name = n[n.index('.')+1:]
+
+            args = func.args if func.args else []
+            kwargs = func.kwargs.__dict__ if func.kwargs else {}
+            pre_result = t(pre_result, func_name, *args, **kwargs)
 
 
 if __name__ == '__main__':

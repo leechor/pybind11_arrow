@@ -1,30 +1,34 @@
-import functools
+import sys
 import types
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
 
 
-def t(self: Any, name: str = '', *args, **kwargs):
-    if getattr(self, name, False):
+def t(self: Any, name: str = None, *args, **kwargs):
+    if self is None:
+        self = sys.modules[__name__]
+
+    if name is not None and getattr(self, name, False):
         # contains name
-        result = getattr(self, name)(*args, **kwargs)
-        if getattr(result, t.__name__, True):
-            if isinstance(self, types.ModuleType):
-                self.t = functools.partial(t, self)
-            else:
-                result.t = types.MethodType(t, result)
+        func = getattr(self, name)
+        result = func(*args, **kwargs)
+        inject_t(result, t)
         return result
+    inject_t(self, t)
+    return self
 
-    if getattr(self, t.__name__, True):
-        # no dot attribute
-        if isinstance(self, types.ModuleType):
-            self.t = functools.partial(t, self)
-        else:
-            self.t = types.MethodType(t, self)
-        return self
 
+def inject_t(target: Any, f: Callable):
+    if getattr(target, t.__name__, False):
+        return
+
+    if isinstance(target, types.ModuleType):
+        setattr(target, f.__name__, f)
+    else:
+        setattr(target, f.__name__, types.MethodType(f, target))
+        # result.t = types.MethodType(t, result)
 
 def testDataFrame(n):
     data = pd.DataFrame(n.random.standard_normal((2, 4)),
@@ -42,6 +46,11 @@ def test2():
               index=index,
               columns=["Colorado", "Texas", "New York", "Ohio"])
     print(frame)
+
+
+def test3():
+    a = t(None, 'test2')
+    print(a)
 
 
 if __name__ == '__main__':
