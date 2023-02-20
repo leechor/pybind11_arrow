@@ -1,6 +1,9 @@
 import json
 import logging
 
+import numpy as np
+import pandas as pd
+
 from src import *
 from src.tm.module_loading import module_import
 
@@ -86,18 +89,43 @@ def process(config: Configure):
 
             args = func.args if func.args else []
             kwargs = func.kwargs.__dict__ if func.kwargs else {}
-            inject_method_by_name(pre_result, func_name)
-            pre_result = t(pre_result, func_name, *args, **kwargs)
+
+            pre_result = invoke_m(pre_result, func_name, *args, **kwargs)
 
             if isinstance(pre_result, pd.DataFrame):
                 pre_result = TmFrame(pre_result)
 
 
+def testDataFrame(n):
+    data = TmFrame(n.random.standard_normal((2, 4)),
+                   index=pd.date_range("2000-01-01", periods=2,
+                                       freq="W-WED"),
+                   columns=["Colorado", "Texas", "New York", "Ohio"])
+    df = TmFrame(data)
+    print(invoke_m(df).invoke_m('resample', 'D').invoke_m('asfreq'))
+
+
+def test2():
+    a = invoke_m(np.random, 'standard_normal', (2, 4))
+    index = invoke_m(pd, 'date_range', '2000-01-01', periods=2, freq="W-WED")
+    frame = invoke_m(pd, "DataFrame", a,
+                     index=index,
+                     columns=["Colorado", "Texas", "New York", "Ohio"])
+    print(frame)
+
+
+def test3():
+    a = invoke_m(None, 'test2')
+    print(a)
+
+
 if __name__ == '__main__':
+    test2()
+    testDataFrame(np)
     inject_method(TmFrame, print_df)
     process(Configure.load(config))
-    # tf = TmFrame(np.random.standard_normal((2, 4)),
-    #              index=pd.date_range("2000-01-01", periods=2,
-    #                                  freq="W-WED"),
-    #              columns=["Colorado", "Texas", "New York", "Ohio"])
-    # tf.head().print_df()
+    tf = TmFrame(np.random.standard_normal((2, 4)),
+                 index=pd.date_range("2000-01-01", periods=2,
+                                     freq="W-WED"),
+                 columns=["Colorado", "Texas", "New York", "Ohio"])
+    tf.head().print_df()

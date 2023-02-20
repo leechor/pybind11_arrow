@@ -2,7 +2,7 @@ import functools
 
 import pandas as pd
 
-from .util import inject_method, t
+from .util import inject_method, invoke_m
 
 
 def get_klas_methods(target):
@@ -29,10 +29,15 @@ def convert_to_tm_frame(func):
     def decorator(*args, **kwargs):
         result = func(*args, **kwargs)
         if isinstance(result, pd.DataFrame):
-            return TmFrame(result)
+            result = TmFrame(result)
+        return result
+
     return decorator
 
 
 @for_all_methods(convert_to_tm_frame)
 class TmFrame(pd.DataFrame):
     pass
+
+
+inject_method(TmFrame, invoke_m)
