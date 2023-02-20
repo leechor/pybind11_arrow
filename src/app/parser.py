@@ -4,8 +4,10 @@ import logging
 import numpy as np
 import pandas as pd
 
-from src import *
-from src.tm.module_loading import module_import
+from tm import print_df
+from tm_frame import TmFrame
+from tools.invoke_inject import invoke_m, inject_method
+from tools.module_loading import module_import
 
 config = '''
 {
@@ -120,12 +122,12 @@ def test3():
 
 
 if __name__ == '__main__':
-    test2()
-    testDataFrame(np)
+        # test2()
+        # testDataFrame(np)
     inject_method(TmFrame, print_df)
     process(Configure.load(config))
     tf = TmFrame(np.random.standard_normal((2, 4)),
                  index=pd.date_range("2000-01-01", periods=2,
                                      freq="W-WED"),
                  columns=["Colorado", "Texas", "New York", "Ohio"])
-    tf.head().print_df()
+    tf.head(6).head(4).print_df()

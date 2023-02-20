@@ -2,7 +2,7 @@ import pyarrow as pa
 import python_example as m
 from pandas import DataFrame
 
-from .tm_frame import TmFrame
+from src.app.tm_frame import TmFrame
 
 
 def dataframe_to_arrow(df: DataFrame):
