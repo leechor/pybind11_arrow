@@ -2,7 +2,7 @@ import json
 import logging
 
 from src import *
-from src.tm.module_loading import import_string, module_import
+from src.tm.module_loading import module_import
 
 config = '''
 {
@@ -20,7 +20,13 @@ config = '''
         },
         {
             "name": "head",
-            "args": [2],
+            "args": [6],
+            "kwargs": null,
+            "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
+        },
+                {
+            "name": "head",
+            "args": [4],
             "kwargs": null,
             "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
         },
@@ -57,7 +63,7 @@ class Configure:
     def __init__(self, d):
         self.name = None
         self.description = None
-        self.flows: list = None
+        self.flows: list = []
         self.__dict__ = d
 
     @classmethod
@@ -83,6 +89,15 @@ def process(config: Configure):
             inject_method_by_name(pre_result, func_name)
             pre_result = t(pre_result, func_name, *args, **kwargs)
 
+            if isinstance(pre_result, pd.DataFrame):
+                pre_result = TmFrame(pre_result)
+
 
 if __name__ == '__main__':
+    inject_method(TmFrame, print_df)
     process(Configure.load(config))
+    # tf = TmFrame(np.random.standard_normal((2, 4)),
+    #              index=pd.date_range("2000-01-01", periods=2,
+    #                                  freq="W-WED"),
+    #              columns=["Colorado", "Texas", "New York", "Ohio"])
+    # tf.head().print_df()

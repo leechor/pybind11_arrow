@@ -1,12 +1,8 @@
 import sys
-import types
 from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
-
-from .tm_frame import TmFrame
-from .pd_func import print_df
 
 
 def t(target: Any, name: str = None, *args, **kwargs):
@@ -25,11 +21,7 @@ def t(target: Any, name: str = None, *args, **kwargs):
     if name is not None and getattr(target, name, False):
         func = getattr(target, name)
         result = func(*args, **kwargs)
-        if isinstance(result, pd.DataFrame):
-            result = TmFrame(result)
         return result
-
-    inject_method(target, t)
     return target
 
 
@@ -44,10 +36,7 @@ def inject_method(target: Any, f: Callable):
     if target is None or getattr(target, f.__name__, False):
         return
 
-    if isinstance(target, types.ModuleType):
-        setattr(target, f.__name__, f)
-    else:
-        setattr(target, f.__name__, types.MethodType(f, target))
+    setattr(target, f.__name__, f)
 
 
 def testDataFrame(n):
