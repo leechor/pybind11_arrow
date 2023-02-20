@@ -4,30 +4,43 @@ from typing import Any, Callable
 
 import numpy as np
 import pandas as pd
+
+from .tm_frame import TmFrame
 from .pd_func import print_df
 
 
-def t(self: Any, name: str = None, *args, **kwargs):
+def t(target: Any, name: str = None, *args, **kwargs):
+    """
+    调用方法到target
+    :param target: 可以是module/class
+    :param name: 函数名
+    :param args: 参数列表
+    :param kwargs: 字典类型参数集合
+    :return: None
+    """
     current_module = sys.modules[__name__]
-    if self is None:
-        self = current_module
+    if target is None:
+        target = current_module
 
-    if name is not None and getattr(self, name, False):
-        func = getattr(self, name)
+    if name is not None and getattr(target, name, False):
+        func = getattr(target, name)
         result = func(*args, **kwargs)
-        inject_t(result, t)
-        return result
-    elif getattr(current_module, name, False):
-        func = getattr(current_module, name)
-        result = func(self, *args, **kwargs)
-        inject_t(result, t)
+        if isinstance(result, pd.DataFrame):
+            result = TmFrame(result)
         return result
 
-    inject_t(self, t)
-    return self
+    inject_method(target, t)
+    return target
 
 
-def inject_t(target: Any, f: Callable):
+def inject_method_by_name(target: Any, func_name: str):
+    current_module = sys.modules[__name__]
+    if getattr(current_module, func_name, False):
+        func = getattr(current_module, func_name)
+        inject_method(target, func)
+
+
+def inject_method(target: Any, f: Callable):
     if target is None or getattr(target, f.__name__, False):
         return
 
@@ -35,7 +48,7 @@ def inject_t(target: Any, f: Callable):
         setattr(target, f.__name__, f)
     else:
         setattr(target, f.__name__, types.MethodType(f, target))
-        # result.t = types.MethodType(t, result)
+
 
 def testDataFrame(n):
     data = pd.DataFrame(n.random.standard_normal((2, 4)),

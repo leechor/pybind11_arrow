@@ -19,6 +19,12 @@ config = '''
             "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
         },
         {
+            "name": "head",
+            "args": [2],
+            "kwargs": null,
+            "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
+        },
+        {
             "name": "print_df",
             "args": [],
             "kwargs": {},
@@ -68,12 +74,13 @@ def process(config: Configure):
             if '.' in func.name:
                 n = func.name
                 pre_result = module_import(n[:n.index('.')])
-                func_name = n[n.index('.')+1:]
+                func_name = n[n.index('.') + 1:]
             else:
                 func_name = func.name
 
             args = func.args if func.args else []
             kwargs = func.kwargs.__dict__ if func.kwargs else {}
+            inject_method_by_name(pre_result, func_name)
             pre_result = t(pre_result, func_name, *args, **kwargs)
 
 
