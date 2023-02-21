@@ -1,3 +1,4 @@
+import builtins
 import sys
 import types
 from typing import Any, Callable
@@ -12,9 +13,8 @@ def invoke_m(target: Any, name: str = None, *args, **kwargs):
     :param kwargs: 字典类型参数集合
     :return: None
     """
-    current_module = sys.modules[__name__]
     if target is None:
-        target = current_module
+        target = builtins
 
     inject_method(target, invoke_m)
     if name is not None:

@@ -16,6 +16,12 @@ int add(int i, int j) {
     return i + j;
 }
 
+py::object invoke_m(py::object target, py::str name, py::args args, py::kwargs kwargs) {
+    py::object iim = py::module_::import("app.tools.invoke_inject");
+    py::object ii = iim.attr("invoke_m")(target, name, *args, **kwargs);
+    return ii;
+}
+
 void load_module() {
     py::object module_loading = py::module_::import("app.tools.module_loading");
     py::object load_func = module_loading.attr("load_module");
@@ -117,10 +123,11 @@ PYBIND11_MODULE(python_example, m) {
       py::print(frame);
    });
 
-   m.def("load_module", &load_module);
+    m.def("load_module", &load_module);
     m.def("castToArrow", &castToArrow);
     m.def("castToDataFrame", &castToDataFrame);
     m.def("print_table", &print_table);
+    m.def("invoke_m", &invoke_m);
 
 
 
@@ -131,6 +138,6 @@ PYBIND11_MODULE(python_example, m) {
 #endif
 }
 
-void main(){
+int main(){
     load_module();
 }

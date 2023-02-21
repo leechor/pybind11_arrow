@@ -2,7 +2,7 @@ import functools
 
 import pandas as pd
 
-from tools.invoke_inject import inject_method, invoke_m
+from src.app.tools.invoke_inject import inject_method, invoke_m
 
 
 def get_klas_methods(target):

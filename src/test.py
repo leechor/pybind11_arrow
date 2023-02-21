@@ -12,6 +12,10 @@ def identify(f: DataFrame) -> DataFrame:
     return m.printDf(f)
 
 
+def test():
+    m.invoke_m(None, "print", 123)
+
+
 if __name__ == '__main__':
     data = {"state": ["Ohio", "Ohio", "Ohio", "Nevada", "Nevada", "Nevada"],
             "year": [2000, 2001, 2002, 2001, 2002, 2003],
@@ -20,3 +24,5 @@ if __name__ == '__main__':
     # identify(df)
     # m.testDataFrameC()
     m.load_module()
+    test()
+
