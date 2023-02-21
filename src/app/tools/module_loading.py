@@ -1,3 +1,4 @@
+import importlib
 import os
 import sys
 from importlib import import_module
@@ -73,3 +74,32 @@ def module_dir(module):
         if filename is not None:
             return os.path.dirname(filename)
     raise ValueError("Cannot determine directory containing %s" % module)
+
+
+class ModuleInfo:
+    def __init__(self, file_path: str):
+        self.file_path = file_path
+        self.module_name = os.path.basename(file_path)
+        self.spec = importlib.util.spec_from_file_location(self.module_name, file_path)
+        self.module = importlib.util.module_from_spec(self.spec)
+
+    def load(self):
+        sys.modules[self.module_name] = self.module
+        self.spec.loader.exec_module(self.module)
+
+    def reload(self):
+        self.load()
+
+    def remove(self):
+        module = self.module
+        del sys.modules[self.module_name]
+        del module
+
+
+if __name__ == '__main__':
+    mu = ModuleInfo(r'D:\project\simul\hello.py')
+    mu.load()
+    mu.module.hello()
+    mu.remove()
+    mu.reload()
+    mu.module.hello()
