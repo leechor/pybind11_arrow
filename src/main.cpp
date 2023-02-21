@@ -16,6 +16,12 @@ int add(int i, int j) {
     return i + j;
 }
 
+void load_module() {
+    py::object module_loading = py::module_::import("app.tools.module_loading");
+    py::object load_func = module_loading.attr("load_module");
+    py::object mu = load_func("D:/project/simul/hello.py");
+    mu.attr("hello")();
+}
 
 std::shared_ptr<arrow::Table> castToArrow(py::object df) {
     py::object dataframe_to_arrow = py::module_::import(modelName).attr("dataframe_to_arrow");
@@ -111,15 +117,11 @@ PYBIND11_MODULE(python_example, m) {
       py::print(frame);
    });
 
+   m.def("load_module", &load_module);
     m.def("castToArrow", &castToArrow);
     m.def("castToDataFrame", &castToDataFrame);
     m.def("print_table", &print_table);
 
-    py::class_<ModuleInfo>(m, "ModuleInfo")
-            .def(py::init<>())
-            .def("load")
-            .def("reload")
-            .def("remove")
 
 
 #ifdef VERSION_INFO

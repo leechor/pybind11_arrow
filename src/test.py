@@ -19,4 +19,4 @@ if __name__ == '__main__':
     df = pd.DataFrame(data)
     # identify(df)
     # m.testDataFrameC()
-    pd.read_csv("D:/project/python_example/src/stock_1.csv")
+    m.load_module()
