@@ -1,9 +1,9 @@
-import json
 import logging
 
 import numpy as np
 import pandas as pd
 
+from src.app.configure import Configure
 from tm import print_df
 from tm_frame import TmFrame
 from tools.invoke_inject import invoke_m, inject_method
@@ -56,24 +56,6 @@ config = '''
 }
 
 '''
-
-
-class Flow:
-    def __init__(self, d):
-        self.name = None
-        self.description = None
-
-
-class Configure:
-    def __init__(self, d):
-        self.name = None
-        self.description = None
-        self.flows: list = []
-        self.__dict__ = d
-
-    @classmethod
-    def load(cls, config: str):
-        return json.loads(config, object_hook=Configure)
 
 
 def process(config: Configure):

@@ -130,3 +130,7 @@ PYBIND11_MODULE(python_example, m) {
     m.attr("__version__") = "dev";
 #endif
 }
+
+void main(){
+    load_module();
+}
