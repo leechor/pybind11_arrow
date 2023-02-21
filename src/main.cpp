@@ -115,6 +115,13 @@ PYBIND11_MODULE(python_example, m) {
     m.def("castToDataFrame", &castToDataFrame);
     m.def("print_table", &print_table);
 
+    py::class_<ModuleInfo>(m, "ModuleInfo")
+            .def(py::init<>())
+            .def("load")
+            .def("reload")
+            .def("remove")
+
+
 #ifdef VERSION_INFO
     m.attr("__version__") = MACRO_STRINGIFY(VERSION_INFO);
 #else

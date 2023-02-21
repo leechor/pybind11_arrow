@@ -1,8 +1,10 @@
 import importlib
+import logging
 import os
 import sys
 from importlib import import_module
 from importlib.util import find_spec as importlib_find
+from pathlib import Path
 
 
 def cached_import(module_path, class_name):
@@ -76,10 +78,39 @@ def module_dir(module):
     raise ValueError("Cannot determine directory containing %s" % module)
 
 
+def reload_module(module_name: str):
+    module = sys.modules.get(module_name)
+    if module is None:
+        logging.ERROR(f'module {module} not exist.')
+        return
+    module.__spec__.loader.exec_module(module)
+
+
+def load_module(file_path: str, module_name: str = None):
+    file_path = file_path
+    if module_name is None:
+        module_name = Path(file_path).stem
+    module_name = module_name
+    spec = importlib.util.spec_from_file_location(module_name, file_path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+def remove_module(module_name: str):
+    module = sys.modules[module_name]
+    del sys.modules[module_name]
+    del module
+
+
 class ModuleInfo:
-    def __init__(self, file_path: str):
+
+    def __init__(self, file_path: str, module_name: str = None):
         self.file_path = file_path
-        self.module_name = os.path.basename(file_path)
+        if module_name is None:
+            module_name = Path(file_path).stem
+        self.module_name = module_name
         self.spec = importlib.util.spec_from_file_location(self.module_name, file_path)
         self.module = importlib.util.module_from_spec(self.spec)
 
@@ -97,9 +128,8 @@ class ModuleInfo:
 
 
 if __name__ == '__main__':
-    mu = ModuleInfo(r'D:\project\simul\hello.py')
-    mu.load()
-    mu.module.hello()
-    mu.remove()
-    mu.reload()
-    mu.module.hello()
+    module = load_module(r'D:\project\simul\hello.py')
+    module.hello()
+    reload_module('hello')
+    module.hello()
+
