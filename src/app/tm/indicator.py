@@ -21,13 +21,15 @@ def parse_regular(expression: str):
     return func
 
 
-def valid_expression(expression: str):
+def valid_expression(expression: str) -> str:
     ex = re.sub('[$#]', '', expression)
     s = SimpleEval()
     try:
         s.parse(ex)
+        return None
     except SyntaxError as e:
         logging.error(f'{expression} expression syntax error, {e.msg}')
+        return e.msg
 
 
 def calculate_row(row, **kwargs):

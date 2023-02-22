@@ -16,6 +16,13 @@ int add(int i, int j) {
     return i + j;
 }
 
+std::string valid_regular_expression(std::string expression){
+    py::object pyo = py::module_::import("src.app.tm.indicator");
+    py::object func = pyo.attr("valid_expression");
+    py::str result = func(expression);
+    return result;
+}
+
 py::object invoke_m(py::object target, py::str name, py::args args, py::kwargs kwargs) {
     py::object iim = py::module_::import("app.tools.invoke_inject");
     py::object ii = iim.attr("invoke_m")(target, name, *args, **kwargs);
@@ -128,6 +135,7 @@ PYBIND11_MODULE(python_example, m) {
     m.def("castToDataFrame", &castToDataFrame);
     m.def("print_table", &print_table);
     m.def("invoke_m", &invoke_m);
+    m.def("valid_regular_expression", &valid_regular_expression);
 
 
 

@@ -23,6 +23,6 @@ if __name__ == '__main__':
     df = pd.DataFrame(data)
     # identify(df)
     # m.testDataFrameC()
-    m.load_module()
-    test()
+    result = m.valid_regular_expression('($Colorado > 0.3) and (#Texas < 0)')
+    print(result)
 
