@@ -1,10 +1,12 @@
+import logging
 import re
 
 import numpy as np
 import pandas as pd
+from pandas import DataFrame
 from simpleeval import SimpleEval
 
-from src.app import TmFrame
+from src.app import TmFrame, inject_method
 
 
 def parse_regular(expression: str):
@@ -17,6 +19,15 @@ def parse_regular(expression: str):
         return s.eval(ex, previously_parsed=parsed)
 
     return func
+
+
+def valid_expression(expression: str):
+    ex = re.sub('[$#]', '', expression)
+    s = SimpleEval()
+    try:
+        s.parse(ex)
+    except SyntaxError as e:
+        logging.error(f'{expression} expression syntax error, {e.msg}')
 
 
 def calculate_row(row, **kwargs):
@@ -50,13 +61,27 @@ def test2():
     print(pi({'a': 4, 'b': 5}))
 
 
+def exec_regular(df: DataFrame, expression: str):
+    """
+    根据规则运算逻辑, 运行数据过滤
+    :param df: self
+    :param expression: 规则运算逻辑表达式, 需要符合python语法
+    :return:
+    """
+    func = parse_regular(expression)
+    frame = df.apply(calculate_row, axis=1, indicator_func=func)
+    return tf[frame]
+
+
+inject_method(TmFrame, exec_regular)
+
 if __name__ == '__main__':
     tf = TmFrame(np.random.standard_normal((2, 4)),
                  index=pd.date_range("2000-01-01", periods=2,
                                      freq="W-WED"),
                  columns=["Colorado", "Texas", "NewYork", "Ohio"])
     print(tf.head())
-    ex = '($Colorado > 3.3) and ((#Texas > 0.7) or (#Ohio < 5) or (#NewYork < 0.3))'
-    func = parse_regular(ex)
-    frame = tf.apply(calculate_row, axis=1, indicator_func=func)
-    print(frame.head())
+    ex = '($Colorado > 0.3) and (#Texas < 0)'
+
+    result = tf.exec_regular(ex)
+    print(result)
