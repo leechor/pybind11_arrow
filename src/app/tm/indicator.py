@@ -21,13 +21,15 @@ def parse_regular(expression: str):
     return func
 
 
-def valid_expression(expression: str):
+def valid_expression(expression: str) -> str:
     ex = re.sub('[$#]', '', expression)
     s = SimpleEval()
     try:
         s.parse(ex)
+        return None
     except SyntaxError as e:
         logging.error(f'{expression} expression syntax error, {e.msg}')
+        return e.msg
 
 
 def calculate_row(row, **kwargs):
@@ -49,18 +51,6 @@ def extract_variables(expression: str, regrex: str):
     return pattern.findall(expression)
 
 
-def test():
-    ex = '$a + $a1 + $ab1 + $a1b + $a12+ $a12b + #a + #a1 + #ab1 + #a1b + #a12+ #a12b'
-    print(extract_variables(ex))
-
-
-def test2():
-    ex = '$a + #b'
-    pi = parse_regular(ex)
-    print(pi({'a': 1, 'b': 2}))
-    print(pi({'a': 4, 'b': 5}))
-
-
 def exec_regular(df: DataFrame, expression: str):
     """
     根据规则运算逻辑, 运行数据过滤
@@ -74,6 +64,17 @@ def exec_regular(df: DataFrame, expression: str):
 
 
 inject_method(TmFrame, exec_regular)
+
+
+def test():
+    ex = '$a + $a1 + $ab1 + $a1b + $a12+ $a12b + #a + #a1 + #ab1 + #a1b + #a12+ #a12b'
+    print(extract_variables(ex))
+
+    ex = '$a + #b'
+    pi = parse_regular(ex)
+    print(pi({'a': 1, 'b': 2}))
+    print(pi({'a': 4, 'b': 5}))
+
 
 if __name__ == '__main__':
     tf = TmFrame(np.random.standard_normal((2, 4)),
