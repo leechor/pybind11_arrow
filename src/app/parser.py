@@ -5,6 +5,7 @@ import pandas as pd
 
 from src.app.configure import Configure
 from src.app.tm.pd_func import print_df
+from src.app.tools.module_loading import module_import
 from tm_frame import TmFrame
 from tools.invoke_inject import invoke_m, inject_method, get_module_func_name
 
@@ -62,9 +63,9 @@ def process(config: Configure):
         pre_result = None
         for func in flow.functions:
             logging.info(f'{func.name} and {func.description}')
-            module_name, func_name = get_module_func_name(func.name)
-            if module_name is not None:
-                pre_result = module_name
+            module, func_name = get_module_func_name(func.name)
+            if module is not None:
+                pre_result = module
 
             args = func.args if func.args else []
             kwargs = func.kwargs.__dict__ if func.kwargs else {}

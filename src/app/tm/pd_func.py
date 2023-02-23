@@ -1,5 +1,4 @@
 import inspect
-import json
 import re
 from pathlib import Path
 
@@ -8,7 +7,7 @@ import pyarrow as pa
 import python_example as m
 from pandas import DataFrame
 
-from src.app.tools.invoke_inject import inject_method, invoke_m, get_module_func_name
+from src.app.tools.invoke_inject import inject_method, invoke_by_json
 from src.app.tm_frame import TmFrame
 
 
@@ -35,22 +34,6 @@ def read_tm_data(file_path: str):
                        usecols=[0, 1],
                        names=['time', tm, task])
     return TmFrame(data)
-
-
-class Argument:
-    def __init__(self, d):
-        self.__dict__ = d
-
-    def __getattr__(self, item):
-        pass
-
-
-def invoke_by_json(arg: str):
-    argument = json.loads(arg, object_hook=Argument)
-    module_name, func_name = get_module_func_name(argument.name)
-    args = argument.args if argument.args else []
-    kwargs = argument.kwargs.__dict__ if argument.kwargs else {}
-    return invoke_m(module_name, func_name, *args, **kwargs)
 
 
 inject_method(TmFrame, dataframe_to_arrow)

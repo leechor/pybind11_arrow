@@ -1,7 +1,10 @@
 import builtins
+import inspect
+import json
 import logging
 import sys
 import types
+import typing
 from typing import Any, Callable
 
 from src.app.tools.module_loading import module_import
@@ -52,9 +55,49 @@ def inject_method(target: Any, f: Callable):
         pass
 
 
+def get_function_by_name(name: str):
+    if name is not None:
+        module, func_name = get_module_func_name(name)
+
+        if getattr(module, func_name, False):
+            func = getattr(module, func_name)
+            return func
+
+
 def get_module_func_name(name: str):
     r = name.rsplit('.', 1)
     if len(r) == 1:
         return None, r[0]
     else:
         return module_import(r[0]), r[1]
+
+
+class Argument:
+    def __init__(self, d):
+        self.__dict__ = d
+
+    def __getattr__(self, item):
+        pass
+
+
+def invoke_by_json(arg: str):
+    argument = json.loads(arg, object_hook=Argument)
+    module_name, func_name = get_module_func_name(argument.name)
+    args = argument.args if argument.args else []
+    kwargs = argument.kwargs.__dict__ if argument.kwargs else {}
+    return invoke_m(module_name, func_name, *args, **kwargs)
+
+
+def get_func_arguments_by_name(name: str):
+    func = get_function_by_name(name)
+    if func is not None:
+        return get_func_arguments(func)
+
+
+def get_func_arguments(func: typing.Callable):
+    return inspect.getfullargspec(func)
+
+
+if __name__ == '__main__':
+    func = get_func_arguments_by_name('src.app.tools.invoke_inject.invoke_by_json')
+    print(func)
