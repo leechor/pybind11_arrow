@@ -16,7 +16,8 @@ def test():
     m.invoke_m(None, "print", 123)
 
 
-if __name__ == '__main__':
+def valid_regular():
+    global data
     data = {"state": ["Ohio", "Ohio", "Ohio", "Nevada", "Nevada", "Nevada"],
             "year": [2000, 2001, 2002, 2001, 2002, 2003],
             "pop": [1.5, 1.7, 3.6, 2.4, 2.9, 3.2]}
@@ -25,4 +26,9 @@ if __name__ == '__main__':
     # m.testDataFrameC()
     result = m.valid_regular_expression('($Colorado > 0.3) and (#Texas < 0)')
     print(result)
+
+
+if __name__ == '__main__':
+    df = m.read_csv(r'D:/project/python_example/src/stock_2.csv')
+    print(df)
 

@@ -6,20 +6,61 @@
 #include <iostream>
 #include <pybind11/stl.h>
 
+#include <arrow/csv/api.h>
+#include <arrow/filesystem/localfs.h>
+
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 namespace py = pybind11;
-const char* modelName = "tm";
+const char* pd_func_module = "src.app.tm.pd_func";
 
 int add(int i, int j) {
     return i + j;
 }
 
-pyt::object invoke_by_json(std::string arg) {
-    py::object pf =  py::module_::import("src.app.tm.pd_func");
-    ibj = pf.attr("invoke_by_json");
-    return ibj(arg)
+py::object invoke_by_json(std::string arg) {
+    py::object pf =  py::module_::import(pd_func_module);
+    py::object ibj = pf.attr("invoke_by_json");
+    return ibj(arg);
+}
+
+py::object read_csv(std::string filePath) {
+    arrow::io::IOContext io_context = arrow::io::default_io_context();
+    arrow::fs::LocalFileSystem local_fs(
+            arrow::fs::LocalFileSystemOptions::Defaults());
+    auto result_ifstream = local_fs.OpenInputStream(filePath);
+    if (!result_ifstream.ok()) {
+        std::cout << "Failed to open file: " << filePath << std::endl;
+    }
+    std::shared_ptr<arrow::io::InputStream> input = result_ifstream.ValueOrDie();
+
+    auto read_options = arrow::csv::ReadOptions::Defaults();
+    auto parse_options = arrow::csv::ParseOptions::Defaults();
+    auto convert_options = arrow::csv::ConvertOptions::Defaults();
+
+    // Instantiate TableReader from input stream and options
+    auto maybe_reader =
+            arrow::csv::TableReader::Make(io_context,
+                                          input,
+                                          read_options,
+                                          parse_options,
+                                          convert_options);
+    if (!maybe_reader.ok()) {
+        // Handle TableReader instantiation error...
+    }
+    std::shared_ptr<arrow::csv::TableReader> reader = *maybe_reader;
+
+    // Read table from CSV file
+    auto maybe_table = reader->Read();
+    if (!maybe_table.ok()) {
+        // Handle CSV read error
+        // (for example a CSV syntax error or failed type conversion)
+    }
+    std::shared_ptr<arrow::Table> table = *maybe_table;
+
+    py::object arrow_to_dataframe = py::module_::import(pd_func_module).attr("arrow_to_dataframe");
+    return arrow_to_dataframe(table);
 }
 
 std::string valid_regular_expression(std::string expression){
@@ -43,7 +84,7 @@ void load_module() {
 }
 
 std::shared_ptr<arrow::Table> castToArrow(py::object df) {
-    py::object dataframe_to_arrow = py::module_::import(modelName).attr("dataframe_to_arrow");
+    py::object dataframe_to_arrow = py::module_::import(pd_func_module).attr("dataframe_to_arrow");
     py::object src = dataframe_to_arrow(df);
     PyObject *source = src.ptr();
 
@@ -117,7 +158,7 @@ PYBIND11_MODULE(python_example, m) {
    )pbdoc", "i"_a, "j"_a);
 
    m.def("printDf", [](py::object df) {
-        auto pd_func = py::module_::import(modelName).attr("print_df");
+        auto pd_func = py::module_::import(pd_func_module).attr("print_df");
 
        pd_func(df);
        return df;
@@ -142,6 +183,7 @@ PYBIND11_MODULE(python_example, m) {
     m.def("print_table", &print_table);
     m.def("invoke_m", &invoke_m);
     m.def("valid_regular_expression", &valid_regular_expression);
+    m.def("read_csv", &read_csv);
 
 
 

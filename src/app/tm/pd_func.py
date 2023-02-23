@@ -1,3 +1,4 @@
+import inspect
 import json
 import re
 from pathlib import Path
@@ -16,7 +17,7 @@ def dataframe_to_arrow(df: DataFrame):
 
 
 def arrow_to_dataframe(table: pa.Table):
-    return table.to_pandas(table)
+    return table.to_pandas()
 
 
 def print_df(df: TmFrame):
@@ -62,5 +63,6 @@ if __name__ == '__main__':
      "args": ["C:/Users/hp/Nutstore/.nutstore_Y2hpbmFiaHN1bkBnbWFpbC5jb20=/record/2023/zdpx/XXXX TX05 20221226至20221228数据txt"]
     }
     """
+    sign = inspect.signature(invoke_by_json)
     result = invoke_by_json(arg)
     print(result)
