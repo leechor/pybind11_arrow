@@ -3,6 +3,8 @@ import sys
 import types
 from typing import Any, Callable
 
+from src.app.tools.module_loading import module_import
+
 
 def invoke_m(target: Any, name: str = None, *args, **kwargs):
     """
@@ -46,3 +48,15 @@ def inject_method(target: Any, f: Callable):
         # type maybe immutable
         pass
 
+
+def get_module_func_name(name: str):
+    module_name = None
+    func_name = ""
+    if '.' in name:
+        n = name
+        point_pos = n.rindex('.')
+        module_name = module_import(n[:point_pos])
+        func_name = n[point_pos + 1:]
+    else:
+        func_name = name
+    return module_name, func_name

@@ -12,11 +12,16 @@ class Configure:
     def load(cls, config: str):
         return json.loads(config, object_hook=Configure)
 
+    def __getattr__(self, item):
+        pass
 
 class Flow:
     def __init__(self, d):
         self.name = None
         self.description = None
+
+    def __getattr__(self, item):
+        pass
 
 
 def parse_tm_pre_flow(tm):

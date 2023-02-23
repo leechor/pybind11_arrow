@@ -3,11 +3,11 @@ import logging
 import numpy as np
 import pandas as pd
 
+from src.app import get_module_func_name
 from src.app.configure import Configure
 from tm import print_df
 from tm_frame import TmFrame
 from tools.invoke_inject import invoke_m, inject_method
-from tools.module_loading import module_import
 
 config = '''
 {
@@ -63,13 +63,9 @@ def process(config: Configure):
         pre_result = None
         for func in flow.functions:
             logging.info(f'{func.name} and {func.description}')
-            func_name = ""
-            if '.' in func.name:
-                n = func.name
-                pre_result = module_import(n[:n.index('.')])
-                func_name = n[n.index('.') + 1:]
-            else:
-                func_name = func.name
+            module_name, func_name = get_module_func_name(func.name)
+            if module_name is not None:
+                pre_result = module_name
 
             args = func.args if func.args else []
             kwargs = func.kwargs.__dict__ if func.kwargs else {}
