@@ -1,4 +1,5 @@
 import builtins
+import logging
 import sys
 import types
 from typing import Any, Callable
@@ -25,6 +26,8 @@ def invoke_m(target: Any, name: str = None, *args, **kwargs):
             result = func(*args, **kwargs)
             inject_method(result, invoke_m)
             return result
+        else:
+            logging.warning(f"{target}.{name} not exist")
     return target
 
 
@@ -50,13 +53,8 @@ def inject_method(target: Any, f: Callable):
 
 
 def get_module_func_name(name: str):
-    module_name = None
-    func_name = ""
-    if '.' in name:
-        n = name
-        point_pos = n.rindex('.')
-        module_name = module_import(n[:point_pos])
-        func_name = n[point_pos + 1:]
+    r = name.rsplit('.', 1)
+    if len(r) == 1:
+        return None, r[0]
     else:
-        func_name = name
-    return module_name, func_name
+        return module_import(r[0]), r[1]
