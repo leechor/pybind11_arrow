@@ -16,6 +16,12 @@ int add(int i, int j) {
     return i + j;
 }
 
+pyt::object invoke_by_json(std::string arg) {
+    py::object pf =  py::module_::import("src.app.tm.pd_func");
+    ibj = pf.attr("invoke_by_json");
+    return ibj(arg)
+}
+
 std::string valid_regular_expression(std::string expression){
     py::object pyo = py::module_::import("src.app.tm.indicator");
     py::object func = pyo.attr("valid_expression");
