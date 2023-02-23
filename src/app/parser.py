@@ -3,11 +3,10 @@ import logging
 import numpy as np
 import pandas as pd
 
-from src.app import get_module_func_name
 from src.app.configure import Configure
-from tm import print_df
+from src.app.tm.pd_func import print_df
 from tm_frame import TmFrame
-from tools.invoke_inject import invoke_m, inject_method
+from tools.invoke_inject import invoke_m, inject_method, get_module_func_name
 
 config = '''
 {
