@@ -56,6 +56,11 @@ inject_method(TmFrame, dataframe_to_arrow)
 
 
 if __name__ == '__main__':
-    arg = r'{"name": "src.app.tm.pd_func.read_tm_data", "args": ["C:/Users/hp/Nutstore/.nutstore_Y2hpbmFiaHN1bkBnbWFpbC5jb20=/record/2023/zdpx/XXXX TX05 20221226至20221228数据txt"]}'
+    arg = r"""
+    {
+     "name": "src.app.tm.pd_func.read_tm_data",
+     "args": ["C:/Users/hp/Nutstore/.nutstore_Y2hpbmFiaHN1bkBnbWFpbC5jb20=/record/2023/zdpx/XXXX TX05 20221226至20221228数据txt"]
+    }
+    """
     result = invoke_by_json(arg)
     print(result)
