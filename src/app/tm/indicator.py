@@ -6,7 +6,7 @@ import pandas as pd
 from pandas import DataFrame
 from simpleeval import SimpleEval
 
-from src.app import TmFrame, inject_method
+from src.app.tm_frame import TmFrame, inject_method
 
 
 def parse_regular(expression: str):
