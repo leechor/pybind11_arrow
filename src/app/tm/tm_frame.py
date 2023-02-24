@@ -2,8 +2,6 @@ import functools
 
 import pandas as pd
 
-from src.app.tools.invoke_inject import inject_method, invoke_m
-
 
 def get_klas_methods(target):
     """ based on https://stackoverflow.com/a/34452 """
@@ -38,6 +36,3 @@ def convert_to_tm_frame(func):
 @for_all_methods(convert_to_tm_frame)
 class TmFrame(pd.DataFrame):
     pass
-
-
-inject_method(TmFrame, invoke_m)

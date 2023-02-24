@@ -30,7 +30,7 @@ def invoke_m(target: Any, name: str = None, *args, **kwargs):
             inject_method(result, invoke_m)
             return result
         else:
-            logging.warning(f"{target}.{name} not exist")
+            logging.warning(f"{type(target)}.{name} not exist")
     return target
 
 
@@ -50,8 +50,9 @@ def inject_method(target: Any, f: Callable):
             setattr(target, f.__name__, f)
         else:
             setattr(target, f.__name__, types.MethodType(f, target))
-    except Exception:
+    except Exception as e:
         # type maybe immutable
+        logging.warning(e)
         pass
 
 

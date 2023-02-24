@@ -7,8 +7,8 @@ import pyarrow as pa
 import python_example as m
 from pandas import DataFrame
 
-from src.app.tools.invoke_inject import inject_method, invoke_by_json
-from src.app.tm_frame import TmFrame
+from src.app.tm.tm_frame import TmFrame
+from src.app.tools.invoke_inject import invoke_by_json
 
 
 def dataframe_to_arrow(df: DataFrame):
@@ -42,9 +42,6 @@ def read_tm_datas(file_paths: list[str]):
         d = read_tm_data(file_path)
         data = pd.concat([data, d])
     return data
-
-
-inject_method(TmFrame, dataframe_to_arrow)
 
 
 if __name__ == '__main__':

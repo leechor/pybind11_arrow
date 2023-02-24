@@ -1,13 +1,10 @@
 import logging
 
-import numpy as np
 import pandas as pd
 
 from src.app.configure import Configure
-from src.app.tm.pd_func import print_df
-from src.app.tools.module_loading import module_import
-from tm_frame import TmFrame
-from tools.invoke_inject import invoke_m, inject_method, get_module_func_name
+from src.app.tm.tm_frame import TmFrame
+from tools.invoke_inject import invoke_m, get_module_func_name
 
 config = '''
 {
@@ -76,36 +73,6 @@ def process(config: Configure):
                 pre_result = TmFrame(pre_result)
 
 
-def testDataFrame(n):
-    data = TmFrame(n.random.standard_normal((2, 4)),
-                   index=pd.date_range("2000-01-01", periods=2,
-                                       freq="W-WED"),
-                   columns=["Colorado", "Texas", "New York", "Ohio"])
-    df = TmFrame(data)
-    print(invoke_m(df).invoke_m('resample', 'D').invoke_m('asfreq'))
-
-
-def test2():
-    a = invoke_m(np.random, 'standard_normal', (2, 4))
-    index = invoke_m(pd, 'date_range', '2000-01-01', periods=2, freq="W-WED")
-    frame = invoke_m(pd, "DataFrame", a,
-                     index=index,
-                     columns=["Colorado", "Texas", "New York", "Ohio"])
-    print(frame)
-
-
-def test3():
-    a = invoke_m(None, 'test2')
-    print(a)
-
-
 if __name__ == '__main__':
-        # test2()
-        # testDataFrame(np)
-    inject_method(TmFrame, print_df)
     process(Configure.load(config))
-    tf = TmFrame(np.random.standard_normal((2, 4)),
-                 index=pd.date_range("2000-01-01", periods=2,
-                                     freq="W-WED"),
-                 columns=["Colorado", "Texas", "New York", "Ohio"])
-    tf.head(6).head(4).print_df()
+

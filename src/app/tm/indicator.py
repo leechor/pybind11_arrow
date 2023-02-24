@@ -6,7 +6,7 @@ import pandas as pd
 from pandas import DataFrame
 from simpleeval import SimpleEval
 
-from src.app.tm_frame import TmFrame, inject_method
+from src.app.tm.tm_frame import TmFrame
 
 
 def parse_regular(expression: str):
@@ -61,9 +61,6 @@ def exec_regular(df: DataFrame, expression: str):
     func = parse_regular(expression)
     frame = df.apply(calculate_row, axis=1, indicator_func=func)
     return tf[frame]
-
-
-inject_method(TmFrame, exec_regular)
 
 
 def test():
