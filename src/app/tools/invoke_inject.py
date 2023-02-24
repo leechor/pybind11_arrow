@@ -91,7 +91,8 @@ def invoke_by_json(arg: str):
 def get_func_arguments_by_name(name: str):
     func = get_function_by_name(name)
     if func is not None:
-        return get_func_arguments(func)
+        func = get_func_arguments(func)
+        return func.args
 
 
 def get_func_arguments(func: typing.Callable):
@@ -99,5 +100,5 @@ def get_func_arguments(func: typing.Callable):
 
 
 if __name__ == '__main__':
-    func = get_func_arguments_by_name('src.app.tools.invoke_inject.invoke_by_json')
+    func = get_func_arguments_by_name('src.app.tools.invoke_inject.invoke_m')
     print(func)
