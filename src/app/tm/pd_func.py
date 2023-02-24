@@ -27,7 +27,7 @@ def print_df(df: TmFrame):
 def read_tm_data(file_path: str):
     name = Path(file_path).name
     task, tm, start, end, _ = re.split(r'[\s至数]', name)
-    data = pd.read_csv(file_path,
+    data = pd.read_csv(filepath_or_buffer=file_path,
                        parse_dates=True,
                        index_col=0,
                        header=None,
@@ -36,14 +36,23 @@ def read_tm_data(file_path: str):
     return TmFrame(data)
 
 
+def read_tm_datas(file_paths: list[str]):
+    data: TmFrame = None
+    for file_path in file_paths:
+        d = read_tm_data(file_path)
+        data = pd.concat([data, d])
+    return data
+
+
 inject_method(TmFrame, dataframe_to_arrow)
 
 
 if __name__ == '__main__':
     arg = r"""
     {
-     "name": "src.app.tm.pd_func.read_tm_data",
-     "args": ["C:/Users/hp/Nutstore/.nutstore_Y2hpbmFiaHN1bkBnbWFpbC5jb20=/record/2023/zdpx/XXXX TX05 20221226至20221228数据txt"]
+     "name": "src.app.tm.pd_func.read_tm_datas",
+     "args": [["C:/Users/hp/Nutstore/.nutstore_Y2hpbmFiaHN1bkBnbWFpbC5jb20=/record/2023/zdpx/XXXX TX05 20221226至20221228数据txt", 
+     "C:/Users/hp/Nutstore/.nutstore_Y2hpbmFiaHN1bkBnbWFpbC5jb20=/record/2023/zdpx/XXXX TX05 20221226至20221228数据txt"]]
     }
     """
     sign = inspect.signature(invoke_by_json)
