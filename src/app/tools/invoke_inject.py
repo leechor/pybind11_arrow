@@ -30,7 +30,7 @@ def invoke_m(target: Any, name: str = None, *args, **kwargs):
             inject_method(result, invoke_m)
             return result
         else:
-            logging.warning(f"{type(target)}.{name} not exist")
+            logging.warning(f"{target}.{name} not exist")
     return target
 
 

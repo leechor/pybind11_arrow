@@ -2,6 +2,8 @@ import pandas as pd
 import python_example as m
 from pandas import DataFrame
 
+import src
+
 assert m.__version__ == '0.0.1'
 assert m.add(1, 2) == 3
 assert m.subtract(1, 2) == -1
@@ -28,7 +30,11 @@ def valid_regular():
     print(result)
 
 
-if __name__ == '__main__':
+def test3():
     df = m.read_csv(r'D:/project/python_example/src/stock_2.csv')
     print(df)
+
+
+if __name__ == '__main__':
+    m.invoke_m(src.app.abc, 'test')
 
