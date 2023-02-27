@@ -201,13 +201,12 @@ def parse_calc_flows(al: str):
     indicator_expr = parse('$.indicators[*]')
     idcs = [v.value for v in indicator_expr.find(j)]
     for idc in idcs:
-        indicator_functions = {NAME: idc[NAME], TYPE: INDICATOR, FUNCTIONS: idc}
-
         name = idc[NAME]
         # todo
         # load_module(name)
         module_name = Path(name).stem
         idc[NAME] = module_name
+        indicator_functions = {NAME: module_name, TYPE: INDICATOR, FUNCTIONS: idc}
         func_flows.append(indicator_functions)
 
     # regular
