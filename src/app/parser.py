@@ -8,6 +8,7 @@ from jsonpath_ng import parse
 from src.app.configure import Configure
 from src.app.tm.regular import extract_tm_variables, extract_indicator_variables
 from src.app.tm.tm_frame import TmFrame
+from src.app.tools.module_loading import load_module
 from tools.invoke_inject import invoke_m, get_module_func_name
 
 FUNCTIONS = 'functions'
@@ -98,7 +99,7 @@ def process(config: Configure):
             if isinstance(pre_result, pd.DataFrame):
                 pre_result = TmFrame(pre_result)
 
-        t = flow[TYPE]
+        t = flow.type
         if pre_result is not None:
             if t == TM:
                 all_tm_result.append(pre_result)
@@ -112,78 +113,78 @@ def process(config: Configure):
 
 all_config = """
 {
-    "task": "task name",
-    "description": "这一级别用来表示这个配置文件的整体信息",
-    "regulars":  [
-            "$TM1 + $TM2 + #i1", 
-            "$TM1 + #i2 + #i3"
-        ],
-    "indicators": [
-        {
-            "name": "D:/project/python_example/src/test.py",           
-            "args": [],
-            "kwargs": {"filepath_or_buffer": "D:/project/python_example/src/tm_1.csv"},
-            "description": ""
-        },      
-        {
-            "name": "D:/project/python_example/src/test.py",
-            "args": [],
-            "kwargs": {"filepath_or_buffer": "D:/project/python_example/src/tm_1.csv"},
-            "description": ""
-        },
-        {
-            "name": "D:/project/python_example/src/test.py",
-            "args": [],
-            "kwargs": {"filepath_or_buffer": "D:/project/python_example/src/tm_1.csv"},
-            "description": ""
-        }
-    ],
-    "preprocess": {
+  "task": "task name",
+  "description": "这一级别用来表示这个配置文件的整体信息",
+  "regulars": ["$TM1 + $TM2 + #indicator_1", "$TM1 + #indicator_2 + #indicator_1"],
+  "indicators": [
+    {
+      "name": "D:/project/python_example/src/temp/indicator_1.py",
+      "args": [],
+      "kwargs": {
+        "filepath_or_buffer": "D:/project/python_example/src/stock_1.csv"
+      },
+      "description": ""
+    },
+    {
+      "name": "D:/project/python_example/src/temp/indicator_2.py",
+      "args": [],
+      "kwargs": {
+        "filepath_or_buffer": "D:/project/python_example/src/stock_2.csv"
+      },
+      "description": ""
+    }
+  ],
+  "preprocess": {
     "name": "名称",
     "description": "这一级别用来表示这个配置文件的整体信息",
     "flows": [
-    {
+      {
         "name": "TM1",
         "description": "这一级别用来表示某个参数处理的信息",
-        "functions": [{
+        "functions": [
+          {
             "name": "pandas.read_csv",
             "args": [],
-            "kwargs": {"filepath_or_buffer": "D:/project/python_example/src/tm_1.csv;D:/project/python_example/src/tm_1.csv;D:/project/python_example/src/tm_1.csv;"},
+            "kwargs": {
+              "filepath_or_buffer": "D:/project/python_example/src/stock_1.csv"
+            },
             "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
-        },
-        {
+          },
+          {
             "name": "head",
             "args": [6],
             "kwargs": null,
             "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
-        },
-        {
+          },
+          {
             "name": "head",
             "args": [4],
             "kwargs": null,
             "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
-        },
-        {
+          },
+          {
             "name": "print_df",
             "args": [],
             "kwargs": {},
             "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
-        }]
-    },
-    {
+          }
+        ]
+      },
+      {
         "name": "TM2",
-        "functions": [{
+        "functions": [
+          {
             "name": "pandas.read_csv",
             "args": ["D:/project/python_example/src/stock_2.csv"],
             "kwargs": null,
             "description": "some information"
-        }
+          }
+        ]
+      }
     ]
-    }
-    ]
+  }
 }
 
-}
 """
 
 
@@ -203,10 +204,10 @@ def parse_calc_flows(al: str):
     for idc in idcs:
         name = idc[NAME]
         # todo
-        # load_module(name)
+        load_module(name)
         module_name = Path(name).stem
         idc[NAME] = module_name
-        indicator_functions = {NAME: module_name, TYPE: INDICATOR, FUNCTIONS: idc}
+        indicator_functions = {NAME: f'{module_name}.indicate', TYPE: INDICATOR, FUNCTIONS: idc}
         func_flows.append(indicator_functions)
 
     # regular
@@ -228,7 +229,8 @@ def parse_calc_flows(al: str):
     result[NAME] = parse('$.task').find(j)[0].value
     result[DESCRIPTION] = parse('$.description').find(j)[0].value
     result['flows'] = func_flows
-    print(json.dumps(result, ensure_ascii=False))
+    js = json.dumps(result, ensure_ascii=False)
+    return js
 
 
 def get_Tms(j, tms):
@@ -262,4 +264,12 @@ def testProcess():
 
 
 if __name__ == '__main__':
-    parse_calc_flows(all_config)
+    js = parse_calc_flows(all_config)
+    cf = 'd:/config.json'
+    with open(cf, 'w') as f:
+        f.write(js)
+
+    with open(cf) as f:
+        js = f.read()
+        process(Configure.load(js))
+
