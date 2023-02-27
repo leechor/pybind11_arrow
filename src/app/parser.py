@@ -108,7 +108,7 @@ def process(config: Configure):
             elif t == REGULAR:
                 all_regular_result.append(pre_result)
 
-        return all_regular_result
+    return all_regular_result
 
 
 all_config = """
@@ -161,12 +161,6 @@ all_config = """
             "args": [4],
             "kwargs": null,
             "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
-          },
-          {
-            "name": "print_df",
-            "args": [],
-            "kwargs": {},
-            "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
           }
         ]
       },
@@ -184,6 +178,7 @@ all_config = """
     ]
   }
 }
+
 
 """
 
@@ -206,8 +201,8 @@ def parse_calc_flows(al: str):
         # todo
         load_module(name)
         module_name = Path(name).stem
-        idc[NAME] = module_name
-        indicator_functions = {NAME: f'{module_name}.indicate', TYPE: INDICATOR, FUNCTIONS: idc}
+        idc[NAME] = f'{module_name}.indicate'
+        indicator_functions = {NAME: module_name, TYPE: INDICATOR, FUNCTIONS: [idc]}
         func_flows.append(indicator_functions)
 
     # regular
@@ -215,7 +210,7 @@ def parse_calc_flows(al: str):
         tms, ids = get_regular_variables([regular])
 
         r = {
-            NAME: 'exec_regular',
+            NAME: 'src.app.tm.regular.exec_regular_by_config',
             DESCRIPTION: regular,
             'args': None,
             'kwargs': {
