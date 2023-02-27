@@ -1,4 +1,4 @@
-from src.app.tm.indicator import exec_regular
+from src.app.tm.regular import exec_regular
 from src.app.tm.pd_func import print_df, dataframe_to_arrow
 from src.app.tm.tm_frame import TmFrame
 from src.app.tools.invoke_inject import inject_method, invoke_m

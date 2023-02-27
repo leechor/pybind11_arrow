@@ -15,6 +15,7 @@ class Configure:
     def __getattr__(self, item):
         pass
 
+
 class Flow:
     def __init__(self, d):
         self.name = None

@@ -39,11 +39,15 @@ def calculate_row(row, **kwargs):
 
 
 def extract_tm_variables(expression: str):
-    return extract_variables(expression, r'\$\w+\d*')
+    tms = extract_variables(expression, r'\$\w+\d*')
+    ts = [tm[1:] for tm in tms]
+    return ts
 
 
 def extract_indicator_variables(expression: str):
-    return extract_variables(expression, r'#\w+\d*')
+    ids = extract_variables(expression, r'#\w+\d*')
+    idc = [ds[1:] for ds in ids]
+    return idc
 
 
 def extract_variables(expression: str, regrex: str):
@@ -61,6 +65,11 @@ def exec_regular(df: DataFrame, expression: str):
     func = parse_regular(expression)
     frame = df.apply(calculate_row, axis=1, indicator_func=func)
     return tf[frame]
+
+
+def exec_regular_by_config(*args, **kwargs):
+    tms = kwargs['tms']
+    indicators = kwargs['indicators']
 
 
 def test():
