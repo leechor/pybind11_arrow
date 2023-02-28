@@ -26,6 +26,9 @@ def invoke_m(target: Any, name: str = None, *args, **kwargs):
     if name is not None:
         if getattr(target, name, False):
             func = getattr(target, name)
+            spec = inspect.getfullargspec(func)
+            if 'context' not in spec.kwonlyargs:
+                del kwargs['context']
             result = func(*args, **kwargs)
             inject_method(result, invoke_m)
             return result

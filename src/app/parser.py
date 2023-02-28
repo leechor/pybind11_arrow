@@ -82,7 +82,7 @@ def process(config: Configure):
     :param config:
     :return:
     """
-    all_tm_result, all_indicator_result, all_regular_result = [], [], []
+    context = {'all_tm_result': [], 'all_indicator_result': [], 'all_regular_result': []}
     for flow in config.flows:
         pre_result = None
         for func in flow.functions:
@@ -94,21 +94,22 @@ def process(config: Configure):
             args = func.args if func.args else []
             kwargs = func.kwargs.__dict__ if func.kwargs else {}
 
+            kwargs['context'] = context
+
             pre_result = invoke_m(pre_result, func_name, *args, **kwargs)
 
             if isinstance(pre_result, pd.DataFrame):
                 pre_result = TmFrame(pre_result)
 
-        t = flow.type
         if pre_result is not None:
-            if t == TM:
-                all_tm_result.append(pre_result)
-            elif t == INDICATOR:
-                all_indicator_result.append(pre_result)
-            elif t == REGULAR:
-                all_regular_result.append(pre_result)
+            if flow.type == TM:
+                context['all_tm_result'].append(pre_result)
+            elif flow.type == INDICATOR:
+                context['all_indicator_result'].append(pre_result)
+            elif flow.type == REGULAR:
+                context['all_regular_result'].append(pre_result)
 
-    return all_regular_result
+    return context
 
 
 all_config = """
@@ -121,7 +122,7 @@ all_config = """
       "name": "D:/project/python_example/src/temp/indicator_1.py",
       "args": [],
       "kwargs": {
-        "filepath_or_buffer": "D:/project/python_example/src/stock_1.csv"
+        "filepath_or_buffer": "D:/XXXX TX01 20221226至20221228数据txt"
       },
       "description": ""
     },
@@ -129,7 +130,7 @@ all_config = """
       "name": "D:/project/python_example/src/temp/indicator_2.py",
       "args": [],
       "kwargs": {
-        "filepath_or_buffer": "D:/project/python_example/src/stock_2.csv"
+        "filepath_or_buffer": "D:/XXXX TX02 20221226至20221228数据txt"
       },
       "description": ""
     }
@@ -143,10 +144,10 @@ all_config = """
         "description": "这一级别用来表示某个参数处理的信息",
         "functions": [
           {
-            "name": "pandas.read_csv",
+            "name": "src.app.tm.pd_func.read_tm_data",
             "args": [],
             "kwargs": {
-              "filepath_or_buffer": "D:/project/python_example/src/stock_1.csv"
+              "filepath_or_buffer": "D:/XXXX TX01 20221226至20221228数据txt"
             },
             "description": "函数表示每个处理步骤, 如加载数据函数, 每个函数的默认输出为dataframe, 默认作为下一个函数的第一个函数"
           },
@@ -168,8 +169,8 @@ all_config = """
         "name": "TM2",
         "functions": [
           {
-            "name": "pandas.read_csv",
-            "args": ["D:/project/python_example/src/stock_2.csv"],
+            "name": "src.app.tm.pd_func.read_tm_data",
+            "args": ["D:/XXXX TX02 20221226至20221228数据txt"],
             "kwargs": null,
             "description": "some information"
           }
@@ -178,7 +179,6 @@ all_config = """
     ]
   }
 }
-
 
 """
 

@@ -24,10 +24,10 @@ def print_df(df: TmFrame):
     m.print_table(table)
 
 
-def read_tm_data(file_path: str):
-    name = Path(file_path).name
+def read_tm_data(filepath_or_buffer: str):
+    name = Path(filepath_or_buffer).name
     task, tm, start, end, _ = re.split(r'[\s至数]', name)
-    data = pd.read_csv(filepath_or_buffer=file_path,
+    data = pd.read_csv(filepath_or_buffer=filepath_or_buffer,
                        parse_dates=True,
                        index_col=0,
                        header=None,

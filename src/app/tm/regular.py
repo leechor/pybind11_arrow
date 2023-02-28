@@ -67,9 +67,12 @@ def exec_regular(df: DataFrame, expression: str):
     return tf[frame]
 
 
-def exec_regular_by_config(*args, **kwargs):
+def exec_regular_by_config(*args, context=None, **kwargs):
     tms = kwargs['tms']
-    indicators = kwargs['indicators']
+    all_tm_result = context['all_tm_result']
+    first_column = all_tm_result[0].iloc[:,:2]
+    first_column.columns.values[0] = exec_regular_by_config.__name__
+    return first_column
 
 
 def test():
