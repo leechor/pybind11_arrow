@@ -116,7 +116,7 @@ all_config = """
 {
   "task": "task name",
   "description": "这一级别用来表示这个配置文件的整体信息",
-  "regulars": ["$TM1 + $TM2 + #indicator_1", "$TM1 + #indicator_2 + #indicator_1"],
+  "regulars": ["$TX01 + $TX02 + #indicator_1", "$TX01 + #indicator_2 + #indicator_1"],
   "indicators": [
     {
       "name": "D:/project/python_example/src/temp/indicator_1.py",
@@ -140,7 +140,7 @@ all_config = """
     "description": "这一级别用来表示这个配置文件的整体信息",
     "flows": [
       {
-        "name": "TM1",
+        "name": "TX01",
         "description": "这一级别用来表示某个参数处理的信息",
         "functions": [
           {
@@ -166,7 +166,7 @@ all_config = """
         ]
       },
       {
-        "name": "TM2",
+        "name": "TX02",
         "functions": [
           {
             "name": "src.app.tm.pd_func.read_tm_data",
@@ -215,7 +215,8 @@ def parse_calc_flows(al: str):
             'args': None,
             'kwargs': {
                 'tms': tms,
-                'indicators': ids
+                'indicators': ids,
+                'regular': regular
             }}
         indicator_functions = {NAME: 'regular', TYPE: REGULAR, FUNCTIONS: [r]}
         func_flows.append(indicator_functions)

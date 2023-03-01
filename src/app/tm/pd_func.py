@@ -1,3 +1,4 @@
+import functools
 import inspect
 import re
 from pathlib import Path
@@ -34,6 +35,24 @@ def read_tm_data(filepath_or_buffer: str):
                        usecols=[0, 1],
                        names=['time', tm, task])
     return TmFrame(data)
+
+
+def convert_index_to_period(df):
+    df_r = df
+    if not isinstance(df.index, pd.PeriodIndex):
+        df_r = df.copy()
+        df_r.index = df.index.to_period(freq='S')
+    return df_r
+
+
+def join_tm_by_second(tms: list):
+    def join(df, dfc):
+        df_r = convert_index_to_period(df)
+        dfc_r = convert_index_to_period(dfc)
+        return pd.merge(df_r, dfc_r, on='time')
+
+    result = functools.reduce(join, tms[1:], tms[0])
+    return result
 
 
 def read_tm_datas(file_paths: list[str]):

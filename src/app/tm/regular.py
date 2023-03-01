@@ -6,6 +6,7 @@ import pandas as pd
 from pandas import DataFrame
 from simpleeval import SimpleEval
 
+from src.app.tm.pd_func import join_tm_by_second
 from src.app.tm.tm_frame import TmFrame
 
 
@@ -64,15 +65,22 @@ def exec_regular(df: DataFrame, expression: str):
     """
     func = parse_regular(expression)
     frame = df.apply(calculate_row, axis=1, indicator_func=func)
-    return tf[frame]
+    return frame
 
 
 def exec_regular_by_config(*args, context=None, **kwargs):
     tms = kwargs['tms']
+    ids = kwargs['indicators']
+    regular = kwargs['regular']
+
     all_tm_result = context['all_tm_result']
-    first_column = all_tm_result[0].iloc[:,:2]
-    first_column.columns.values[0] = exec_regular_by_config.__name__
-    return first_column
+    all_indicator_result = context['all_indicator_result']
+
+    tms_data = [df for df in all_tm_result if df.columns[0] in tms]
+    indicator_data = [i for i in all_indicator_result if i.columns[0] in ids]
+    first_column = join_tm_by_second(tms_data + indicator_data)
+    result = exec_regular(first_column, regular)
+    return result
 
 
 def test():
